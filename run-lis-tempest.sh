@@ -33,9 +33,9 @@ fi
 if [[ -z $1 ]]; then
     TEMPEST_DIR="$HOME/lis-tempest"
     LOG_DIR="$HOME/lis-tempest-logs/$TEST_SUITE"
-    TEST_SUITE="TEST_Win2012R2"
-    TEST_IMAGE="centos64-cloudimg-amd64-vss" 
-    TEST_AGGREGATE="2012R2" 
+    SUITE="TEST_Win2012R2"
+    IMAGE="centos64-cloudimg-amd64-vss" 
+    AGGREGATE="2012R2" 
     HOST_IP="10.7.21.15"
     DEFAULT_SSH_USER="root"
     OpenStack_USER="admin"
@@ -70,14 +70,26 @@ export OS_TENANT_NAME="$OpenStack_TENANT"
 export OS_PASSWORD="$OpenStack_PASSWORD"
 export OS_AUTH_URL="http://$HOST_IP:5000/v2.0/"
 
+# Set the flavour
+test_flavour=get_flavour_by_metadata $TEST_AGGREGATE
+iniset $TEMPEST_CONF compute flavor_ref_alt $test_flavour
+iniset $TEMPEST_CONF compute flavor_ref $test_flavour
 
+# Set the image
+test_image=get_imageid $IMAGE
+
+# Set the ssh user
+test_ssh_user=get_ssh_user_from_image $test_image 
+iniset $TEMPEST_CONF compute image_ssh_user $test_ssh_user
+iniset $TEMPEST_CONF compute ssh_user $test_ssh_user
+iniset $TEMPEST_CONF compute image_alt_ssh_user $test_ssh_user
 
 # nova flavor-create m1.nano 42 96 1 1
 # nova flavor-create m1.micro 84 128 2 1
 
-TEMPEST_CONF=etc/tempest.conf
 
 initset $TEMPEST_CONF DEFAULT lock_path /tmp
+
 
 iniset $TEMPEST_CONF identity auth_version v2
 iniset $TEMPEST_CONF identity admin_domain_name Default
@@ -99,15 +111,13 @@ iniset $TEMPEST_CONF identity uri http://10.19.28.3:5000/v2.0/
 
 iniset $TEMPEST_CONF compute volume_device_name sdb
 iniset $TEMPEST_CONF compute ssh_connect_method floating
-iniset $TEMPEST_CONF compute flavor_ref_alt 84
-iniset $TEMPEST_CONF compute flavor_ref 42
+
 iniset $TEMPEST_CONF compute ssh_timeout 196
 iniset $TEMPEST_CONF compute ip_version_for_ssh 4
 iniset $TEMPEST_CONF compute network_for_ssh private
 iniset $TEMPEST_CONF compute allow_tenant_isolation True
-iniset $TEMPEST_CONF compute image_alt_ssh_user cirros
-iniset $TEMPEST_CONF compute image_ssh_user cirros
-iniset $TEMPEST_CONF compute ssh_user cirros
+
+
 iniset $TEMPEST_CONF compute build_interval 1
 iniset $TEMPEST_CONF compute build_timeout 196
 
@@ -123,15 +133,17 @@ iniset $TEMPEST_CONF compute-feature-enabled block_migration_for_live_migration 
 #image_ref = 5ec07fe6-c3bd-4b4b-bac1-b8286866a3e1
 
 
-iniset $TEMPEST_CONF scenario img_disk_format vhd
-iniset $TEMPEST_CONF scenario img_file cirros-0.3.3-x86_64.vhdx
-iniset $TEMPEST_CONF scenario img_dir /root
+# iniset $TEMPEST_CONF scenario img_disk_format vhd
+# iniset $TEMPEST_CONF scenario img_file cirros-0.3.3-x86_64.vhdx
+# iniset $TEMPEST_CONF scenario img_dir /root
 
-MIN_TEST=tempest.scenario.test_minimum_basic.TestMinimumBasicScenario.test_minimum_basic_scenario
+# MIN_TEST=tempest.scenario.test_minimum_basic.TestMinimumBasicScenario.test_minimum_basic_scenario
 
 testr init
 
-testr run --subunit $MIN_TEST | tee >(subunit2junitxml --output-to=results.xml) | subunit-2to1 | tools/colorizer.py
+testr list-tests | grep lis
+
+# testr run --subunit $MIN_TEST | tee >(subunit2junitxml --output-to=results.xml) | subunit-2to1 | tools/colorizer.py
 
 
 # Restore xtrace
