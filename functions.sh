@@ -2105,6 +2105,27 @@ function stop_service {
     fi
 }
 
+# Runs a command multiple times
+# exec_with_retry 5 2 cat
+function exec_with_retry () {
+    local MAX_RETRIES=$1
+    local INTERVAL=$2
+
+    local COUNTER=0
+    while [ $COUNTER -lt $MAX_RETRIES ]; do
+        local EXIT=0
+        eval '${@:3}' || EXIT=$?
+        if [ $EXIT -eq 0 ]; then
+            return 0
+        fi
+        let COUNTER=COUNTER+1
+
+        if [ -n "$INTERVAL" ]; then
+            sleep $INTERVAL
+        fi
+    done
+    return $EXIT
+}
 
 # Restore xtrace
 $XTRACE
