@@ -16,12 +16,12 @@ env:
 image:
   name: centos64-cloudimg-amd64-vss
   external: false
-  externaladdr: http://example.com/vhd/centos.vhd
+  addr: http://example.com/vhd/centos.vhd
 
 test:
-  testname: core
+  name: core
   aggregate: 2012R2
-  testfile: storage-tests.txt
+  file: storage-tests.txt
   
 
   
