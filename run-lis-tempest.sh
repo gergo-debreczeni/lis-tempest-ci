@@ -36,9 +36,7 @@ else
     eval $(parse_yaml $1 "CONF_")
 fi
 
-echo $CONF_env_logdir/$(date +"%m%d%H%M%S")-$CONF_test_suite.log
-
-exit 0
+echo $CONF_env_logdir/$(date +"%m%d%H%M%S")-$CONF_test_name.log
 
 # Copy the tempest conf sample
 # TEMPEST_CONF=$CONF_env_tempestdir/etc/tempest.conf
@@ -85,33 +83,35 @@ CONF_image_ssh_user=get_ssh_user_from_image $CONF_image_name
 fi
 
 # Get the network for ssh
-if [[ -z $CONF_image_ssh_network ]]; then
-    CONF_image_ssh_network=$(neutron net-list | grep private | awk 'FNR == 1 {print $2}')
-    echo "INFO: No ssh network defined in $1. Using the <$CONF_image_ssh_network> network"
+if [[ -z $CONF_env_network_ssh ]]; then
+    CONF_env_network_ssh=$(neutron net-list | grep private | awk 'FNR == 1 {print $2}')
+    echo "INFO: No ssh network defined in $1. Using the <$CONF_env_network_ssh> network"
 fi
 
 # Get the public network
-if [[ -z $CONF_env_public_network ]]; then
-    CONF_env_public_network=$(neutron net-external-list | grep public | awk 'FNR == 1 {print $2}')
-    echo "INFO: No public network defined in $1. Using the <$CONF_env_public_network> network"
+if [[ -z $CONF_env_network_public ]]; then
+    CONF_env_network_public=$(neutron net-external-list | grep public | awk 'FNR == 1 {print $2}')
+    echo "INFO: No public network defined in $1. Using the <$CONF_env_network_public> network"
 fi
 
-# # Get the test log
-# if [[ -z $CONF_image_ssh_network ]]; then
-# # CONF_image_ssh_network=$(neutron net-list | grep private | awk 'FNR == 1 {print $2}')
-# fi
+# Get the test log
+if [[ -z $CONF_env_network_ssh ]]; then
+# CONF_env_network_ssh=$(neutron net-list | grep private | awk 'FNR == 1 {print $2}')
+fi
 
 echo -e "\\nTempest configuration is:"
 compgen -A variable | grep CONF_* | while read var; do printf "%s: %q\n" "$var" "${!var}"; done
 
-# set the compute options
+exit 0
+
+# [compute] 
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref_alt $CONF_image_flavour
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref $CONF_image_flavour
 iniset $CONF_env_tempestdir/etc/tempest.conf compute image_alt_ssh_user $CONF_image_ssh_user
 iniset $CONF_env_tempestdir/etc/tempest.conf compute image_ref_alt $CONF_image_id
 iniset $CONF_env_tempestdir/etc/tempest.conf compute image_ssh_user $CONF_image_ssh_user
 iniset $CONF_env_tempestdir/etc/tempest.conf compute image_ref = $CONF_image_id
-iniset $CONF_env_tempestdir/etc/tempest.conf compute network_for_ssh $CONF_image_ssh_network
+iniset $CONF_env_tempestdir/etc/tempest.conf compute network_for_ssh $CONF_env_network_ssh
 iniset $CONF_env_tempestdir/etc/tempest.conf compute ssh_user $CONF_image_ssh_user
 
 iniset $CONF_env_tempestdir/etc/tempest.conf compute allow_tenant_isolation False
@@ -123,20 +123,17 @@ iniset $CONF_env_tempestdir/etc/tempest.conf compute volume_device_name sdb
 iniset $CONF_env_tempestdir/etc/tempest.conf compute ssh_connect_method floating
 
 
-# 
-iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT log_file $CONF_env_logdir/$(date +"Y%m%d%H%M%S")-$CONF_test_suite.log
+# [DEFAULT] 
+iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT log_file $CONF_env_logdir/$(date +"Y%m%d%H%M%S")-$CONF_test_name.log
 
 iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT debug True
 iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT use_stderr False
 iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT verbose True
 
-
-# 
-[host_credentials]
-host_user_name = Administrator
-host_password = Passw0rd
-host_setupscripts_folder = C:\lis-tempest-ps\
-host_vssbackup_drive = V:
+# [host_credentials]
+iniset $CONF_env_tempestdir/etc/tempest.conf host_credentials host_user_name $CONF_env_hyperv_user
+iniset $CONF_env_tempestdir/etc/tempest.conf host_credentials host_password $CONF_env_hyperv_pass
+iniset $CONF_env_tempestdir/etc/tempest.conf host_credentials host_setupscripts_folder $CONF_env_hyperv_scriptdir
 
 
 
