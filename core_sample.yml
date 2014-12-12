@@ -1,0 +1,14 @@
+env:
+  hostip: 10.7.21.15
+  tempestdir: /users/ubuntu/lis-tempest
+  logdir: /users/ubuntu/lis-tempest-logs
+  osuser: admin
+  ostenant: admin
+  ospassword: Passw0rd
+
+image:
+  name: centos64-cloudimg-amd64-vss
+  aggregate: 2012R2
+
+test:
+  suite: core
