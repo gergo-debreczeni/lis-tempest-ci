@@ -8,10 +8,10 @@ env:
   network: 
     ssh: private
     public: public
-  hypervcompute:
-    username: Administrator
-    password: Passw0rd
-    scriptfolder: c:\scripts
+  hyperv:
+    user: Administrator
+    pass: Passw0rd
+    scriptdir: c:\scripts
 
 image:
   name: centos64-cloudimg-amd64-vss
