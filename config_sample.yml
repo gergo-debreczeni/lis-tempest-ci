@@ -16,7 +16,7 @@ env:
 image:
   name: centos64-cloudimg-amd64-vss
   external: false
-  externaladdr: http://10.7.1.10/vhd/centos.vhd
+  externaladdr: http://example.com/vhd/centos.vhd
 
 test:
   testname: core
