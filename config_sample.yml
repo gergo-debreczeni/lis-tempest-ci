@@ -8,18 +8,19 @@ env:
   network: 
     ssh: private
     public: public
+  hypervcompute:
+    username: Administrator
+    password: Passw0rd
+    scriptfolder: c:\scripts
 
 image:
   name: centos64-cloudimg-amd64-vss
-  image_location
+  image_location:
 
 test:
   testname: core
   aggregate: 2012R2
   testfile:
   
-hyperv:
-  username:
-  password:
-  scriptfolder:
+
   
