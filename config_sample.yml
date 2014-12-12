@@ -21,7 +21,7 @@ image:
 test:
   testname: core
   aggregate: 2012R2
-  testfile:
+  testfile: storage-tests.txt
   
 
   
