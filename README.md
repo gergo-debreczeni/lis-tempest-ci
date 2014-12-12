@@ -1,4 +1,9 @@
 lis-tempest-ci
 ==============
 
-Scripts for running the lis-tempest CI
+Script for running the lis-tempest CI tests
+
+Example:
+```sh
+./run-lis-tempest.sh core_sample.yml
+```
