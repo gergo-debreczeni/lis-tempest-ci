@@ -5,10 +5,20 @@ env:
   osuser: admin
   ostenant: admin
   ospassword: Passw0rd
+  network: 
+    ssh: private
+    public: public
 
 image:
   name: centos64-cloudimg-amd64-vss
-  aggregate: 2012R2
+  image_location
 
 test:
   suite: core
+  aggregate: 2012R2
+  
+hyperv:
+  username:
+  password:
+  scriptfolder:
+  
