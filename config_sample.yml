@@ -14,8 +14,9 @@ image:
   image_location
 
 test:
-  suite: core
+  testname: core
   aggregate: 2012R2
+  testfile:
   
 hyperv:
   username:
