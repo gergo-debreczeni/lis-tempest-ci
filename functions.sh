@@ -759,7 +759,7 @@ function get_flavour_by_metadata {
         echo "No valid flavor found"
         exit
     fi
-    return $flavour
+    echo $flavour
 }
 
 # Check if image exists and return id
@@ -796,7 +796,7 @@ function get_ssh_user_from_image {
         echo "INFO: No ssh user metadata found. Continuing with default username (root)."
         return $DEFAULT_SSH_USER
     fi
-    return "$ssh_user"
+    echo $ssh_user
 }
 
 # Get the default value for HOST_IP
