@@ -96,17 +96,17 @@ if [[ -z $CONF_env_network_public ]]; then
 fi
 
 # Configure logging
-if [[ -z "$CONF_test_logdir" ]] && [[ ! -d "$CONF_test_logdir" ]]; then
+if [[ ! -z "$CONF_test_logdir" ]] && [[ ! -d "$CONF_test_logdir" ]]; then
     mkdir -pv "$CONF_test_logdir"
     # Logfile
     CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".sub"
     CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".log"
 fi
 
-set -o xtrace
+set +o xtrace
 echo -e "\\nTempest configuration is:"
 compgen -A variable | grep CONF_* | while read var; do printf "%s: %q\n" "$var" "${!var}"; done
-set +o xtrace
+set -o xtrace
 # [compute] 
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref_alt $CONF_image_flavour
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref $CONF_image_flavour
@@ -150,6 +150,7 @@ if [[ $CONF_test_parallel ]]; then
     testr run --parallel --subunit  --load-list=$CONF_test_list |  subunit-2to1  > $CONF_test_subunitlog 2>&1
 else
     testr run --subunit  --load-list=$CONF_test_list |  subunit-2to1  > $CONF_test_subunitlog 2>&1
+fi
 
 cat $CONF_test_subunitlog | /opt/stack/tempest/tools/colorizer.py > $CONF_test_tempestlog 2>&1
 python /home/ubuntu/bin/subunit2html.py $CONF_test_tempestlog
