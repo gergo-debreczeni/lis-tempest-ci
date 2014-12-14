@@ -101,8 +101,8 @@ if [[ ! -z $CONF_test_logdir ]] && [[ ! -d "$CONF_test_logdir" ]]; then
 fi
 
 # Logfile
-CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".sub"
-CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".log"
+CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.sub
+CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.log
 
 set +o xtrace
 echo -e "\\nTempest configuration is:"
