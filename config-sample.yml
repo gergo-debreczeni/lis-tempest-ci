@@ -10,10 +10,10 @@ env:
   hyperv:
     user: Administrator
     pass: Passw0rd
-    scriptdir: c:\scripts
+    scriptdir: c:/\scripts
 
 image:
-  name: centos64-cloudimg-amd64-vss
+  name: cirros-cloudimg
   external: false
   addr: http://example.com/vhd/centos.vhd
 
