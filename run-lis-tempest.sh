@@ -106,8 +106,6 @@ fi
 echo -e "\\nTempest configuration is:"
 compgen -A variable | grep CONF_* | while read var; do printf "%s: %q\n" "$var" "${!var}"; done
 
-exit 0
-
 # [compute] 
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref_alt $CONF_image_flavour
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref $CONF_image_flavour
@@ -152,10 +150,8 @@ if [[ $CONF_test_parallel ]]; then
 else
     testr run --subunit  --load-list=$CONF_test_list |  subunit-2to1  > $CONF_test_subunitlog 2>&1
 
-
 cat $CONF_test_subunitlog | /opt/stack/tempest/tools/colorizer.py > $CONF_test_tempestlog 2>&1
 python /home/ubuntu/bin/subunit2html.py $CONF_test_tempestlog
-
 
 # Restore xtrace
 $XTRACE
