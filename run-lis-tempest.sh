@@ -153,7 +153,7 @@ testr init
 if [[ $CONF_test_parallel ]]; then
     testr run --parallel --subunit  --load-list=$CONF_test_list | subunit-2to1 > $CONF_test_subunitlog 2>&1
 else
-    testr run --subunit  tempest.lis.core.test_heartbeat_v2.TestLis.test_server_lis_heartbeat | subunit-2to1 > $CONF_test_subunitlog 2>&1
+    testr run --subunit  --load-list=$CONF_test_list | subunit-2to1 > $CONF_test_subunitlog 2>&1
 fi
 
 cat $CONF_test_subunitlog | /opt/stack/tempest/tools/colorizer.py > $CONF_test_tempestlog 2>&1
