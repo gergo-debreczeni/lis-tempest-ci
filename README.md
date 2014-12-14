@@ -1,9 +1,15 @@
 lis-tempest-ci
 ==============
 
-Script for running the lis-tempest CI tests
+Atomation script for running the lis-tempest CI tests.
 
-Example:
+###Configuration
+Edit `config-sample.yml`
+Populate `tests-sample.list` 
+
+(both files can be renamed)
+
+###Running tests:
 ```sh
-./run-lis-tempest.sh core_sample.yml
+./run-lis-tempest.sh config-sample.yml
 ```
