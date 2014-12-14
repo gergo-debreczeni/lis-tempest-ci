@@ -43,6 +43,8 @@ fi
 if [[ ! -z $CONF_test_logdir ]]; then
     CONF_test_logdir=$CONF_test_logdir/$TIME_STAMP_$CONF_test_name
     mkdir -pv $CONF_test_logdir
+    CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.sub
+    CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.log
 else
     echo "ERROR: The test_logdir is not set in $1!"
     exit 1
