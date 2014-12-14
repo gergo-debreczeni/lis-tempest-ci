@@ -10,7 +10,7 @@ env:
   hyperv:
     user: Administrator
     pass: Passw0rd
-    scriptdir: c:\\scripts
+    scriptdir: c:\scripts
 
 image:
   name: cirros-cloudimg

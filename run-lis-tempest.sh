@@ -96,17 +96,19 @@ if [[ -z $CONF_env_network_public ]]; then
 fi
 
 # Configure logging
-if [[ ! -z "$CONF_test_logdir" ]] && [[ ! -d "$CONF_test_logdir" ]]; then
+if [[ ! -z $CONF_test_logdir ]] && [[ ! -d "$CONF_test_logdir" ]]; then
     mkdir -pv "$CONF_test_logdir"
-    # Logfile
-    CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".sub"
-    CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".log"
 fi
+
+# Logfile
+CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".sub"
+CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".log"
 
 set +o xtrace
 echo -e "\\nTempest configuration is:"
 compgen -A variable | grep CONF_* | while read var; do printf "%s: %q\n" "$var" "${!var}"; done
 set -o xtrace
+
 # [compute] 
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref_alt $CONF_image_flavour
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref $CONF_image_flavour
@@ -125,7 +127,6 @@ iniset $CONF_env_tempestdir/etc/tempest.conf compute ip_version_for_ssh 4
 iniset $CONF_env_tempestdir/etc/tempest.conf compute volume_device_name sdb
 iniset $CONF_env_tempestdir/etc/tempest.conf compute ssh_connect_method floating
 
-
 # [DEFAULT] 
 iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT log_file $CONF_test_tempestlog
 
@@ -138,18 +139,15 @@ iniset $CONF_env_tempestdir/etc/tempest.conf host_credentials host_user_name $CO
 iniset $CONF_env_tempestdir/etc/tempest.conf host_credentials host_password $CONF_env_hyperv_pass
 iniset $CONF_env_tempestdir/etc/tempest.conf host_credentials host_setupscripts_folder $CONF_env_hyperv_scriptdir
 
-
-
-# MIN_TEST=tempest.scenario.test_minimum_basic.TestMinimumBasicScenario.test_minimum_basic_scenario
-
 # Run tempest
+# =============
 testr init
 
 # Check if parallel testing is enabled
 if [[ $CONF_test_parallel ]]; then
-    testr run --parallel --subunit  --load-list=$CONF_test_list | ubunit-2to1 > $CONF_test_subunitlog 2>&1
+    testr run --parallel --subunit  --load-list=$CONF_test_list | subunit-2to1 > $CONF_test_subunitlog 2>&1
 else
-    testr run --subunit  --load-list=$CONF_test_list | subunit-2to1 > $CONF_test_subunitlog 2>&1
+    testr run --subunit  tempest.lis.core.test_heartbeat_v2.TestLis.test_server_lis_heartbeat | subunit-2to1 > $CONF_test_subunitlog 2>&1
 fi
 
 cat $CONF_test_subunitlog | /opt/stack/tempest/tools/colorizer.py > $CONF_test_tempestlog 2>&1
