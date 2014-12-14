@@ -22,7 +22,7 @@ XTRACE=$(set +o | grep xtrace)
 set -o xtrace
 
 # Get current timestamp
-TIME_STAMP=$(date +"%H%M%S-%d%m%Y")
+TIME_STAMP=$(date +"%d%m%Y-%H%M%S-")
 
 # Source utils functions
 source functions.sh
@@ -41,10 +41,10 @@ fi
 
 # Check logdir
 if [[ ! -z $CONF_test_logdir ]]; then
-    CONF_test_logdir=$CONF_test_logdir/$TIME_STAMP_$CONF_test_name
+    CONF_test_logdir="$CONF_test_logdir/$TIME_STAMP$CONF_test_name"
     mkdir -pv $CONF_test_logdir
-    CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.sub
-    CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.log
+    CONF_test_subunitlog=$CONF_test_logdir/$CONF_test_name.sub
+    CONF_test_tempestlog=$CONF_test_logdir/$CONF_test_name.log
 else
     echo "ERROR: The test_logdir is not set in $1!"
     exit 1
