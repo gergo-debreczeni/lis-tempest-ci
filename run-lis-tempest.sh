@@ -54,10 +54,10 @@ fi
 
 cd $CONF_env_tempestdir
 
-sudo python tools/install_venv.py
-source .venv/bin/activate
+# sudo python tools/install_venv.py
+# source .venv/bin/activate
 
-sudo pip install -r requirements.txt
+# sudo pip install -r requirements.txt
 
 if [[ -d ".testrepository" ]]; then
     rm -rf .testrepository
@@ -70,17 +70,17 @@ export OS_AUTH_URL="http://$CONF_env_hostip:5000/v2.0/"
 
 # Get the flavour
 if [[ -z $CONF_image_flavour ]]; then
-CONF_image_flavour=get_flavour_by_metadata $CONF_image_aggregate
+CONF_image_flavour=$(get_flavour_by_metadata $CONF_test_aggregate)
 fi
 
 # Get the image id
 if [[ -z $CONF_image_id ]]; then
-CONF_image_id=get_imageid $CONF_image_name
+CONF_image_id=$(get_imageid $CONF_image_name)
 fi
 
 # Get the ssh user
 if [[ -z $CONF_image_ssh_user ]]; then
-CONF_image_ssh_user=get_ssh_user_from_image $CONF_image_name
+CONF_image_ssh_user=$(get_ssh_user_from_image $CONF_image_name)
 fi
 
 # Get the network for ssh
@@ -103,9 +103,10 @@ if [[ -z "$CONF_test_logdir" ]] && [[ ! -d "$CONF_test_logdir" ]]; then
     CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".log"
 fi
 
+set -o xtrace
 echo -e "\\nTempest configuration is:"
 compgen -A variable | grep CONF_* | while read var; do printf "%s: %q\n" "$var" "${!var}"; done
-
+set +o xtrace
 # [compute] 
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref_alt $CONF_image_flavour
 iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref $CONF_image_flavour
