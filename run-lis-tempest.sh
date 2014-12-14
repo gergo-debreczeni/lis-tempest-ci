@@ -115,7 +115,7 @@ iniset $CONF_env_tempestdir/etc/tempest.conf compute flavor_ref $CONF_image_flav
 iniset $CONF_env_tempestdir/etc/tempest.conf compute image_alt_ssh_user $CONF_image_ssh_user
 iniset $CONF_env_tempestdir/etc/tempest.conf compute image_ref_alt $CONF_image_id
 iniset $CONF_env_tempestdir/etc/tempest.conf compute image_ssh_user $CONF_image_ssh_user
-iniset $CONF_env_tempestdir/etc/tempest.conf compute image_ref = $CONF_image_id
+iniset $CONF_env_tempestdir/etc/tempest.conf compute image_ref $CONF_image_id
 iniset $CONF_env_tempestdir/etc/tempest.conf compute network_for_ssh $CONF_env_network_ssh
 iniset $CONF_env_tempestdir/etc/tempest.conf compute ssh_user $CONF_image_ssh_user
 
