@@ -39,6 +39,15 @@ else
     eval $(parse_yaml $1 "CONF_")
 fi
 
+# Check logdir
+if [[ ! -z $CONF_test_logdir ]]; then
+    CONF_test_logdir=$CONF_test_logdir/$TIME_STAMP_$CONF_test_name
+    mkdir -pv $CONF_test_logdir
+else
+    echo "ERROR: The test_logdir is not set in $1!"
+    exit 1
+fi
+
 # Check if env_tempestdir and test_list variable are set
 if [[ -z $CONF_env_tempestdir ]] || [[ -z $CONF_test_list ]]; then
     echo "ERROR: The env_tempestdir or test_list are not set in $1!"
@@ -48,6 +57,8 @@ else
     cp tempest.conf.sample $CONF_env_tempestdir/etc/tempest.conf
     cp $CONF_test_list $CONF_env_tempestdir/
 fi
+
+
 
 # Main script body
 # ================
@@ -95,14 +106,7 @@ if [[ -z $CONF_env_network_public ]]; then
     echo "INFO: No public network defined in $1. Using the <$CONF_env_network_public> network"
 fi
 
-# Configure logging
-if [[ ! -z $CONF_test_logdir ]] && [[ ! -d "$CONF_test_logdir" ]]; then
-    mkdir -pv "$CONF_test_logdir"
-fi
 
-# Logfile
-CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.sub
-CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name.log
 
 set +o xtrace
 echo -e "\\nTempest configuration is:"
