@@ -19,7 +19,10 @@
 
 # Save trace setting
 XTRACE=$(set +o | grep xtrace)
-set +o xtrace
+set -o xtrace
+
+# Get current timestamp
+TIME_STAMP=$(date +"%H%M%S-%d%m%Y")
 
 # Source utils functions
 source functions.sh
@@ -36,29 +39,27 @@ else
     eval $(parse_yaml $1 "CONF_")
 fi
 
-echo $CONF_env_logdir/$(date +"%m%d%H%M%S")-$CONF_test_name.log
-
-# Copy the tempest conf sample
-# TEMPEST_CONF=$CONF_env_tempestdir/etc/tempest.conf
-cp tempest.conf.sample $CONF_env_tempestdir/etc/tempest.conf
-
-# Create logdir
-# LOG_DIR=$CONF_env_logdir/
-# mkdir -f $LOG_DIR
-
-
+# Check if env_tempestdir and test_list variable are set
+if [[ -z $CONF_env_tempestdir ]] || [[ -z $CONF_test_list ]]; then
+    echo "ERROR: The env_tempestdir or test_list are not set in $1!"
+    exit 1
+else
+    # Copy the tempest conf sample and test list file
+    cp tempest.conf.sample $CONF_env_tempestdir/etc/tempest.conf
+    cp $CONF_test_list $CONF_env_tempestdir/
+fi
 
 # Main script body
 # ================
 
 cd $CONF_env_tempestdir
 
-python tools/install_venv.py
+sudo python tools/install_venv.py
 source .venv/bin/activate
 
-pip install -r requirements.txt
+sudo pip install -r requirements.txt
 
-if [ -d ".testrepository" ]; then
+if [[ -d ".testrepository" ]]; then
     rm -rf .testrepository
 fi
 
@@ -94,9 +95,12 @@ if [[ -z $CONF_env_network_public ]]; then
     echo "INFO: No public network defined in $1. Using the <$CONF_env_network_public> network"
 fi
 
-# Get the test log
-if [[ -z $CONF_env_network_ssh ]]; then
-# CONF_env_network_ssh=$(neutron net-list | grep private | awk 'FNR == 1 {print $2}')
+# Configure logging
+if [[ -z "$CONF_test_logdir" ]] && [[ ! -d "$CONF_test_logdir" ]]; then
+    mkdir -pv "$CONF_test_logdir"
+    # Logfile
+    CONF_test_subunitlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".sub"
+    CONF_test_tempestlog=$CONF_test_logdir/$TIME_STAMP-$CONF_test_name + ".log"
 fi
 
 echo -e "\\nTempest configuration is:"
@@ -124,7 +128,7 @@ iniset $CONF_env_tempestdir/etc/tempest.conf compute ssh_connect_method floating
 
 
 # [DEFAULT] 
-iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT log_file $CONF_env_logdir/$(date +"Y%m%d%H%M%S")-$CONF_test_name.log
+iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT log_file $CONF_test_tempestlog
 
 iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT debug True
 iniset $CONF_env_tempestdir/etc/tempest.conf DEFAULT use_stderr False
@@ -137,22 +141,20 @@ iniset $CONF_env_tempestdir/etc/tempest.conf host_credentials host_setupscripts_
 
 
 
-
-#image_ref_alt = 5ec07fe6-c3bd-4b4b-bac1-b8286866a3e1
-#image_ref = 5ec07fe6-c3bd-4b4b-bac1-b8286866a3e1
-
-
-# iniset $TEMPEST_CONF scenario img_disk_format vhd
-# iniset $TEMPEST_CONF scenario img_file cirros-0.3.3-x86_64.vhdx
-# iniset $TEMPEST_CONF scenario img_dir /root
-
 # MIN_TEST=tempest.scenario.test_minimum_basic.TestMinimumBasicScenario.test_minimum_basic_scenario
 
+# Run tempest
 testr init
 
-testr list-tests | grep lis
+# Check if parallel testing is enabled
+if [[ $CONF_test_parallel ]]; then
+    testr run --parallel --subunit  --load-list=$CONF_test_list |  subunit-2to1  > $CONF_test_subunitlog 2>&1
+else
+    testr run --subunit  --load-list=$CONF_test_list |  subunit-2to1  > $CONF_test_subunitlog 2>&1
 
-# testr run --subunit $MIN_TEST | tee >(subunit2junitxml --output-to=results.xml) | subunit-2to1 | tools/colorizer.py
+
+cat $CONF_test_subunitlog | /opt/stack/tempest/tools/colorizer.py > $CONF_test_tempestlog 2>&1
+python /home/ubuntu/bin/subunit2html.py $CONF_test_tempestlog
 
 
 # Restore xtrace
