@@ -5,7 +5,7 @@ env:
   ostenant: admin
   ospassword: Passw0rd
   network: 
-    ssh: private
+    ssh: 32fad6ab-119e-4809-a3cc-32ed43a540d5
     public: public
   hyperv:
     user: Administrator
